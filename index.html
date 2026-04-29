@@ -77,6 +77,18 @@
 
         .header-btn.feedback:hover { background: rgba(39,174,96,0.5); }
 
+        .header-btn.like {
+            background: rgba(231,76,60,0.3);
+            border-color: rgba(231,76,60,0.5);
+            transition: all 0.3s;
+        }
+        .header-btn.like:hover { background: rgba(231,76,60,0.5); }
+        .header-btn.like.liked {
+            background: rgba(231,76,60,0.7);
+            border-color: rgba(231,76,60,0.9);
+            transform: scale(1.05);
+        }
+
         .tab-nav {
             display: flex;
             gap: 2px;
@@ -319,6 +331,7 @@
             <button class="header-btn" onclick="exportToWord()">&#128196; Export to Word</button>
             <button class="header-btn" onclick="window.print()">&#128424; Print</button>
             <a class="header-btn feedback" href="mailto:sunil1308@gmail.com?subject=%5BToolkit%20Feedback%5D&body=Section%3A%20(e.g.%20Pre-Departure%2C%20Financial%2C%20Benefits%2C%20etc.)%0A%0AFeedback%3A%0A%0A">&#128172; Submit Feedback</a>
+            <button class="header-btn like" id="likeBtn" onclick="toggleLike()">&#10084;&#65039; Like This</button>
         </div>
 
         <nav class="tab-nav">
@@ -1208,5 +1221,28 @@
     </script>
     <script data-goatcounter="https://ms-retirement-toolkit.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
+    <script>
+        // Like button
+        const likeBtn = document.getElementById('likeBtn');
+        if (localStorage.getItem('toolkit-liked')) {
+            likeBtn.classList.add('liked');
+            likeBtn.innerHTML = '\u2764\uFE0F Liked!';
+        }
+        function toggleLike() {
+            const liked = localStorage.getItem('toolkit-liked');
+            if (!liked) {
+                localStorage.setItem('toolkit-liked', '1');
+                likeBtn.classList.add('liked');
+                likeBtn.innerHTML = '\u2764\uFE0F Liked!';
+                if (window.goatcounter && window.goatcounter.count) {
+                    window.goatcounter.count({ path: 'like', event: true });
+                }
+            } else {
+                localStorage.removeItem('toolkit-liked');
+                likeBtn.classList.remove('liked');
+                likeBtn.innerHTML = '\u2764\uFE0F Like This';
+            }
+        }
+    </script>
 </body>
 </html>
