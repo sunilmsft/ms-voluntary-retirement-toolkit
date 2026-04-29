@@ -78,15 +78,22 @@
         .header-btn.feedback:hover { background: rgba(39,174,96,0.5); }
 
         .header-btn.like {
-            background: rgba(231,76,60,0.3);
-            border-color: rgba(231,76,60,0.5);
+            background: rgba(241,196,15,0.25);
+            border-color: rgba(241,196,15,0.5);
+            color: #fff;
             transition: all 0.3s;
         }
-        .header-btn.like:hover { background: rgba(231,76,60,0.5); }
+        .header-btn.like:hover { background: rgba(241,196,15,0.45); }
         .header-btn.like.liked {
-            background: rgba(231,76,60,0.7);
-            border-color: rgba(231,76,60,0.9);
-            transform: scale(1.05);
+            background: rgba(241,196,15,0.6);
+            border-color: rgba(241,196,15,0.9);
+        }
+        .like-count {
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            padding: 0 6px;
+            font-size: 0.75rem;
+            margin-left: 2px;
         }
 
         .tab-nav {
@@ -1222,25 +1229,44 @@
     <script data-goatcounter="https://ms-retirement-toolkit.goatcounter.com/count"
             async src="//gc.zgo.at/count.js"></script>
     <script>
-        // Like button
+        // Like button with live count
         const likeBtn = document.getElementById('likeBtn');
+        let likeCount = 0;
+
+        function updateBtnText(liked) {
+            const countBadge = likeCount > 0 ? ' <span class="like-count">' + likeCount + '</span>' : '';
+            likeBtn.innerHTML = (liked ? '\u2764\uFE0F Liked!' : '\u2764\uFE0F Like This') + countBadge;
+        }
+
+        // Fetch live count from GoatCounter
+        fetch('https://ms-retirement-toolkit.goatcounter.com/counter/like.json')
+            .then(r => r.json())
+            .then(data => {
+                likeCount = parseInt(data.count_unique || data.count || '0', 10);
+                updateBtnText(!!localStorage.getItem('toolkit-liked'));
+            })
+            .catch(() => {});
+
         if (localStorage.getItem('toolkit-liked')) {
             likeBtn.classList.add('liked');
-            likeBtn.innerHTML = '\u2764\uFE0F Liked!';
         }
+        updateBtnText(!!localStorage.getItem('toolkit-liked'));
+
         function toggleLike() {
             const liked = localStorage.getItem('toolkit-liked');
             if (!liked) {
                 localStorage.setItem('toolkit-liked', '1');
                 likeBtn.classList.add('liked');
-                likeBtn.innerHTML = '\u2764\uFE0F Liked!';
+                likeCount++;
+                updateBtnText(true);
                 if (window.goatcounter && window.goatcounter.count) {
                     window.goatcounter.count({ path: 'like', event: true });
                 }
             } else {
                 localStorage.removeItem('toolkit-liked');
                 likeBtn.classList.remove('liked');
-                likeBtn.innerHTML = '\u2764\uFE0F Like This';
+                likeCount = Math.max(0, likeCount - 1);
+                updateBtnText(false);
             }
         }
     </script>
